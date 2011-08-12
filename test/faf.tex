@@ -1,0 +1,823 @@
+% $Id: faf.tex,v 1.2 2008/01/02 19:11:53 dvermeir Exp $
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \documentclass{ipmu2008}
+
+\documentclass[12pt,a4paper]{article}
+% \documentclass[a4paper]{article}
+\usepackage{url}
+
+\usepackage{color}
+% \usepackage[pdftex]{graphicx}
+\usepackage{latexsym}
+\usepackage{amsfonts}
+\usepackage{amssymb} % \curlywedge, \curlyvee
+\DeclareSymbolFontAlphabet{\mathbb}{AMSb}
+\newcommand{\Nat}{\ensuremath{\mathbb N}}
+\newcommand{\Real}{\ensuremath{\mathbb R}}
+\newcommand{\Complex}{\ensuremath{\mathbb C}}
+% Some auxiliary symbols for \Forall, \Exists
+\DeclareMathSymbol{\FORALL}   {\mathord}{symbols}{"38}
+\DeclareMathSymbol{\EXISTS}   {\mathord}{symbols}{"39}
+\DeclareMathSymbol{\SUCHTHAT} {\mathbin}{symbols}{"01}
+% E.g. \Forall{x\in\Nat}{even(x)\lor odd(x)}
+% E.g. \Exists{x\in\Nat}{\not\Exists{y\in\Nat}{y>x}}
+% \def\Forall#1#2{{\FORALL#1} \SUCHTHAT #2}
+% \def\Exists#1#2{{\EXISTS#1} \SUCHTHAT #2}
+\newcommand{\Exists}[2]{\ensuremath{\EXISTS{#1} \SUCHTHAT {#2}}}
+\newcommand{\Forall}[2]{\ensuremath{\FORALL{#1} \SUCHTHAT {#2}}}
+\def\OExists#1#2{{{\EXISTS^\omega}#1} \SUCHTHAT #2}
+
+\newcommand{\todo}[1]{(\textsc{todo}: \textbf{#1})}
+\newenvironment{ltodo}{\begin{description}\item[\textbf{TODO}]}{\end{description}}
+\newcommand{\mc}[1]{\ensuremath{\mathcal{#1}}}
+
+% FAF
+\newcommand{\abfaf}{\textsc{faf}}
+\newcommand{\combine}{\mc{C}}
+\newcommand{\combiner}[1]{\ensuremath{\combine_{#1}}}
+\newcommand{\J}{\ensuremath{\mc{J}}}
+\newcommand{\JJ}[1]{\ensuremath{\mc{J}_{#1}}}
+\newcommand{\D}{\ensuremath{\mc{D}}}
+\newcommand{\DD}[1]{\ensuremath{\mc{D}_{#1}}}
+\newcommand{\JD}[1]{\ensuremath{(\JJ{#1},\DD{#1})}}
+
+% Argumentation frameworks
+\newcommand{\attack}{\ensuremath{\not\rightarrow}}
+\newcommand{\eattack}{\ensuremath{\attack^e}}
+\newcommand{\support}{\ensuremath{\rightarrow}}
+\newcommand{\af}[2]{\ensuremath{\langle{#1},{#2}\rangle}}
+\newcommand{\baf}[3]{\ensuremath{\langle{#1},{#2},{#3}\rangle}}
+\newcommand{\abaf}{\textsc{af}}
+\newcommand{\abbaf}{\textsc{baf}}
+
+% Fuzzy
+\newcommand{\Fuzzy}[1]{\ensuremath{\mc{F}({#1})}}
+\newcommand{\ssupport}[1]{\ensuremath{\mathit{supp}({#1})}}
+%\newcommand{\ssupport}[1]{\ensuremath{\bar{#1}}}
+\newcommand{\Aggr}[1]{\ensuremath{\mc{A}_{#1}}}
+\newcommand{\Negator}{\mc{N}}
+\newcommand{\Implicator}{\mc{I}}
+\newcommand{\Bi}[1]{\ensuremath{\mc{B}#1}}
+\newcommand{\Lattice}{\ensuremath{\mc{L}}}
+\newcommand{\fand}{\ensuremath{\curlywedge}}
+\newcommand{\for}{\ensuremath{\curlyvee}}
+\newcommand{\fneg}{\ensuremath{\sim}}
+\newcommand{\fullimg}[2]{\ensuremath{{}^{#2}{#1}}}
+\newcommand{\subdirectimg}[2]{\ensuremath{{}_{#2}{#1}}}
+
+\begin{document}
+
+\newcommand{\set}[1]{{\ensuremath{\{ #1 \}}}}
+
+\newcommand{\abfasp}{\textsc{fasp}}
+% For logic programs.
+% E.g.
+%  \begin{program}
+%  srule{a}{b,c} % a <- b,c
+%  srule{b}{d,c} % b <- d,c
+%  \end{program}
+\newenvironment{program}{\[\begin{array}{r@{\:\gets\:}l}}{\end{array}\]}
+\newenvironment{program2c}{\[\begin{array}{r@{\:\gets\:}l@{\:\:\:}r@{\:\gets\:}l}}{\end{array}\]}
+\newenvironment{program3c}{\[\begin{array}{r@{\:\gets\:}lr@{\:\gets\:}lr@{\:\gets\:}l}}{\end{array}\]}
+\newcommand{\srule}[2]{\ensuremath{#1 & #2}}
+\newcommand{\prule}[2]{\ensuremath{#1\leftarrow#2}}
+\newcommand{\constraint}[1]{\ensuremath{(\prule{}{#1})}}
+\newcommand{\lrule}[3]{\ensuremath{#1\mathrm{:}\;\;#2 & #3}}
+\newcommand{\lprule}[3]{\ensuremath{#1\mathrm{:}\;\;\prule{#2}{#3}}}
+
+\newcommand{\pair}[2]{\ensuremath{\langle{#1},{#2}\rangle}}
+\newcommand{\T}[1]{\ensuremath{\mathbf{T}_{#1}}}
+\newcommand{\F}[1]{\ensuremath{\mathcal{F}_{#1}}}
+\newcommand{\AS}[1]{\ensuremath{\mathcal{J}_{#1}}}
+\newcommand{\GAS}[1]{\ensuremath{\mathcal{J}^{\star}_{#1}}}
+\newcommand{\naf}[1]{\ensuremath{\mathit{not}\;#1}}
+\newcommand{\hbase}[1]{\ensuremath{\mathcal{B}_{#1}}}
+
+%% Zaken van Jeroen
+\newcommand{\fimp}{\ensuremath{\rightsquigarrow}}
+\newcommand{\supr}{\ensuremath{\sup\limits}}
+\newcommand{\infi}{\ensuremath{\inf\limits}}
+\newcommand{\aspr}{\leftarrow} % ASP rule
+\newcommand{\aspprog}[1]{$$\begin{array}{l@{\;\aspr\;}l}#1\end{array}$$}
+\newcommand{\aspn}[1]{\textit{not}\;#1}
+\newcommand{\hint}[1]{\lbrace\textnormal{#1}\rbrace}
+\newcommand{\imp}{\Rightarrow}
+\newcommand{\minof}[2]{\ensuremath{\min(#1,#2)}}
+
+%% More structure:
+\newcommand{\suproff}[1]{\ensuremath{\sup_{}\{{#1}\}}}
+\newcommand{\infofset}[2]{\ensuremath{\inf_{#1}\{{#2}\}}}
+\newcommand{\suprof}[2]{\ensuremath{\sup_{#1}({#2})}}
+\newcommand{\infof}[2]{\ensuremath{\inf_{#1}({#2})}}
+\newcommand{\fimplies}[2]{\ensuremath{{#1}\rightsquigarrow{#2}}}
+
+\newcommand{\qed}{\hfill \ensuremath{\Box}}
+
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newenvironment{proof}{\textbf{Proof\\}}{\qed{}\vspace{1em}}
+\newenvironment{Proof}{\textbf{Proof\\}}{\qed{}\vspace{1em}}
+
+\title{Fuzzy Argumentation Frameworks}
+\date{\today}
+\author{
+Jeroen Janssen\thanks{Funded by the Fund for Scientific Research - Flanders (FWO-Vlaanderen)}\\
+  Dept. of Computer Science \\
+  Vrije Universiteit Brussel\\
+  jeroen.janssen@vub.ac.be \\
+\and Martine De Cock \\
+  Dept. of Appl. Math. \\
+  and Computer Science\\
+  Universiteit Gent \\
+  martine.decock@ugent.be
+\and Dirk Vermeir \\
+   Dept. of Computer Science \\
+   Vrije Universiteit Brussel\\
+   dvermeir@vub.ac.be \\
+}
+
+\maketitle
+\bibliographystyle{alpha} 
+
+\begin{abstract}
+We propose fuzzy argumentation frameworks as a conservative extension
+of traditional argumentation frameworks\cite{dung95}. The fuzzy
+approach enriches the expressive power of the classical argumentation
+model by allowing to represent the relative strength of the attack
+relationships between arguments, as well as the degree to which
+arguments are accepted. Furthermore, we explore the relationship with
+fuzzy answer set programming, more in particular the correspondence
+between the stable extensions of a fuzzy argumentation framework and
+the fuzzy models of an associated program.
+
+{\bf Keywords:} Fuzzy argumentation frameworks, fuzzy answer set programming, query expansion.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      1. Introduction
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}\label{sec-intro}
+The challenge of understanding argumentation and its role in human
+reasoning has been addressed by many researchers in different fields,
+including philosophy, logic, and AI.  A formal theory of argumentation
+has been proposed in a seminal article by Dung\cite{dung95}. This
+theory is based on the idea that a statement (argument) is believable
+if it can be \emph{defended} successfully against contesting arguments.
+Thus, the theory considers so-called \emph{argumentation frameworks} that
+model the interactions between different arguments, while abstracting
+from the meaning or internal structure of an argument.  Within a given
+framework of interacting arguments, there might be one, or more, sets
+of conclusions, called \emph{extensions}, that are deemed collectively
+acceptable. 
+
+In human argumentation however, in many cases, not all attacks have equal strength.
+For example, in a murder trial, the argument ``her fingerprints are on
+the murder weapon'' is a stronger attack on the premise ``the accused is
+innocent'' than the argument that ``she was the last person to see the
+victim alive''. Furthermore, statements like ``the accused is innocent'' and ``the accused did not have a good relationship with the victim'' may hold to, and hence may be deemed acceptable to, a certain extent only, as opposed to being either accepted or not.
+In the present paper, we therefore introduce \emph{fuzzy argumentation
+frameworks} as a conservative extension of \cite{dung95}'s notion.
+Advantages of the fuzzy approach include the possibility to
+represent the relative strength of the (attack) relationships
+between arguments and a more sophisticated approach to
+extensions: being fuzzy sets of arguments, an extension may
+commit only to a certain degree to the acceptance of a certain
+argument, thus weakening any (unanswered) attacks on it. 
+
+Already in \cite{dung95}, a strong link between non-monotonic
+reasoning formalisms and argumentation frameworks was presented. E.g.
+the stable model semantics for logic programs naturally maps to
+argumentation frameworks where an argument constitutes a derivation in
+the program. In the present paper, we take a different approach: we
+show that a program can be obtained from a fuzzy argumentation framework such that the
+fuzzy models of the program correspond to the stable extensions
+of the framework.
+
+The rest of the paper is organised as follows: to introduce the notation used in the paper, in Section~\ref{sec-prelim} we recall some preliminaries re. fuzzy logic. Next we introduce fuzzy argumentation frameworks by providing the basic definitions and properties (Section~\ref{sec-faf}) as well as a sample application (Section~\ref{sec-appl}). The relationship with fuzzy answer set programs is
+established in Section~\ref{sec-fasp} and Section~\ref{sec-conclusions} concludes.
+
+Due to space restrictions, all proofs have been omitted. They can be
+obtained from~\url{http://tinf2.vub.ac.be/~dvermeir/papers/faf-full.pdf}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      2. Preliminaries
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Preliminaries}\label{sec-prelim}
+
+Throughout this paper, membership values are taken from a complete lattice called a  \emph{truth lattice}, i.e.~a partially
+ordered set $(\Lattice, \leq_\Lattice)$ where every subset of
+\Lattice{} has a greatest lower bound ($\inf$) and a least upper bound
+($\sup$)\cite{birkhoff:1967}. Where the order is clear from the context, we 
+refer to the lattice as $\Lattice$ instead of $(\Lattice, \leq_\Lattice)$. In addition we use $0_\Lattice$ and $1_\Lattice$,
+or $0$ and $1$ if \Lattice{} is understood,
+to denote the smallest and greatest element of \Lattice{},
+respectively. 
+The traditional logical operations of negation, conjunction, disjunction, and implication
+are generalized to logical operators acting on
+truth values of \Lattice{} in the usual way (see e.g.~\cite{novak:1999}):
+\begin{itemize}
+\item A \emph{negator} on \Lattice{} is any anti-monotone $\Lattice \to \Lattice$
+mapping \fneg{} satisfying
+$\fneg 0_\Lattice = 1_\Lattice$ and $\fneg 1_\Lattice = 0_\Lattice$. 
+A negator
+\fneg{} is called \emph{involutive} iff \Forall{x\in\Lattice}{\fneg \fneg x = x}.
+\item
+A \emph{triangular norm}, t-norm for short, on $\Lattice$ is any
+commutative and associative $\Lattice^2 \to \Lattice$ (infix) operator $\fand$ satisfying
+\Forall{x\in\Lattice}{1_\Lattice \fand x = x}. Moreover we require $\fand$ to be
+increasing in both of its arguments, i.e.\footnote{Note that the
+monotonicity of the second component immediately follows from that of the
+first component due to the commutativity.} for $x_1, x_2 \in \Lattice$,
+$x_1 \leq_{\Lattice} x_2$ implies $x_1 \fand y \leq_{\Lattice} x_2 \fand y$.
+Intuitively, a t-norm corresponds to conjunction.
+\item
+A \emph{triangular conorm}, t-conorm for short, on $\Lattice$ is any
+commutative and associative $\Lattice^2 \to \Lattice$
+(infix) operator $\for$ satisfying \Forall{x\in\Lattice}{0_\Lattice \for x = x}.
+Moreover we require $\for$ to be increasing in both of its arguments. 
+A t-conorm corresponds to disjunction.
+\item
+An \emph{implicator} $\fimp$ on $\Lattice$ is any $\Lattice^2 \to \Lattice$ (infix) operator
+$\fimp$ satisfying $\fimplies{0_\Lattice}{0_\Lattice} = 1_\Lattice$, and 
+\Forall{x\in\Lattice}{\fimplies{1_\Lattice}{x} =  x}.
+Moreover $\fimp$ must be decreasing in its first, and
+increasing in its second argument, i.e., for $x_1,x_2,y\in\Lattice$,~$x_1 \leq_{\Lattice} x_2$
+implies $\fimplies{x_1}{y} \geq_{\Lattice} \fimplies{x_2}{y}$ as well as 
+$\fimplies{y}{x_1} \leq_{\Lattice} \fimplies{y}{x_2}$.
+\end{itemize}
+The \emph{residual implicator} of a t-norm $\fand$ is defined by 
+$\fimplies{x}{y} = \sup\set{\lambda\in\Lattice{}\mid x\fand \lambda
+  \leq_\Lattice{} y}$,
+while a t-conorm $\for$ and a negator $\fneg$ induce an S-implicator defined by 
+$\fimplies{x}{y} = \fneg x \curlyvee y$.
+
+In this paper, we will mostly assume that truth lattices are finite.
+E.g. finite subsets of $[0,1]$ such as \set{0.0, 0.1, \ldots, 0.9,
+1.0} are used frequently. Well-known fuzzy logical operators include
+the \emph{minimum t-norm} $x \fand y = \min(x,y)$, its residual implicator $x
+\fimp y = 1$ if $x \leq y$, and $x \fimp y = y$ otherwise, as well as
+the corresponding S-implicator $x \fimp y = \max(1-x,y)$. The
+\emph{{\L}ukasiewicz t-norm} $x \fand y = \max(x+y-1,0)$ induces the residual
+implicator $x \fimp y = \min(1-x+y,1)$, which is also an S-implicator.
+For negation, often the \emph{standard negator} $\fneg x = 1-x$ is used. 
+
+A \emph{fuzzy set} $A$ over some (ordinary) set $X$ and a truth lattice
+\Lattice{} is an $X \rightarrow \Lattice{}$ mapping. We use \Fuzzy{X},
+where \Lattice{} is understood,
+to denote the set of all fuzzy sets over $X$.
+We sometimes use the notation $x^l$ to denote that $A(x) = l$.
+The \emph{support} of a fuzzy set $A$ is defined by
+$\ssupport{A} = \set{x \mid A(x) > 0_\Lattice}$.
+Fuzzy set intersection is defined by $(A \cap B)(x) = A(x) \fand B(x)$. Fuzzy set inclusion is also defined as usual by $A \subseteq_{\Lattice} B$, or $A \subseteq B$ if \Lattice{} is understood, iff \Forall{x\in X}{A(x) \leq_{\Lattice} B(x)}.
+A fuzzy relation over $X$ is a fuzzy set over $X \times X$.
+
+%We will also use the notion of \emph{full image} and \emph{subdirect
+%image} of a fuzzy set
+%under a fuzzy relation (see e.g. \cite{bocoke:2003}): for
+%a fuzzy set $X$ over $U$ and a binary fuzzy binary relation $R$
+%over $U\times U$, the full image of $X$ under $R$ is a fuzzy set
+%\fullimg{X}{R}over $U$ defined by
+%\[
+%\fullimg{X}{R} (x) = \suprof{y\in U}{ X(y) \fand R(y,x)}
+%\]
+%while the subdirect image of $X$ under $R$ is defined by
+%\[
+%\subdirectimg{X}{R} (y) = \infof{x\in U}{\fimplies{X(x)}{R(x,y)}}
+%\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      3. Fuzzy argumentation frameworks
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Fuzzy Argumentation Frameworks}\label{sec-faf}
+
+An argumentation framework\cite{dung95} consists of a set of
+\emph{arguments}, some of which \emph{attack} each other. Intuitively,
+an \emph{extension} of such a framework represents a position, i.e.
+a set of arguments a rational agent may subscribe to, that
+can be defended against attacks. 
+
+\begin{definition}\label{def-af}
+An \emph{argumentation framework} (\abaf{} for short) is a tuple
+\af{\mc{A}}{\attack{}}
+where $\mc{A}$ is a set of arguments and 
+$\attack{} \subseteq \mc{A} \times \mc{A}$
+is a binary \emph{attack} relation between arguments. When $a_1 \attack a_2$,
+we say that the argument $a_1$ \emph{attacks} the argument
+$a_2$. The notation is extended to sets in the obvious way: i.e.~for $b$ an argument, and $A$ and $B$ sets of arguments, 
+$A \attack b$ iff
+\Exists{a\in A}{a\attack b}, while
+$b \attack A$ iff \Exists{a\in A}{b\attack a}, and
+$A \attack B$ iff \Exists{b\in B}{A\attack b}.
+\end{definition}
+
+\begin{definition}\label{def-afb}
+Let \af{\mc{A}}{\attack{}} be an \abaf{}. %argumentation framework.
+A set $A\subseteq \mc{A}$ is \emph{conflict-free} if
+no argument in $A$ attacks an argument in $A$,
+i.e. $\neg (A\attack A)$.
+A conflict-free set $A$ is an \emph{admissible extension} if it defends
+itself against all attacks, i.e. \Forall{b\attack A}{A\attack b}.
+A \emph{preferred extension} is a maximal (w.r.t. $\subseteq$) admissible extension.
+A \emph{stable extension} is a preferred extension $A$ that attacks all
+external arguments, i.e. \Forall{b\not\in A}{A\attack b}.
+\end{definition}
+
+\begin{example}\cite{gorkar96}\label{exaf1}
+The \abaf{}
+\af{\set{\mathit{porsche},\mathit{volvo},\mathit{safe},\mathit{sporty}}}{R},
+ where $R$ contains
+$\mathit{porsche}\attack\mathit{volvo}$,
+$\mathit{volvo}\attack\mathit{porsche}$,
+$\mathit{safe}\attack\mathit{sporty}$,
+$\mathit{safe}\attack\mathit{porsche}$,
+$\mathit{sporty}\attack\mathit{safe} $, and
+$\mathit{sporty}\attack\mathit{volvo}$,
+represents a discussion between a wife and her
+husband about buying a car. There are two stable extensions:
+\set{\mathit{sporty},\mathit{porsche}}
+and
+\set{\mathit{safe},\mathit{volvo}}. Note that, on its own,
+e.g.~\set{\mathit{safe}} is already admissible (but not preferred).
+\end{example}
+
+\begin{example}\label{exfaf0}
+The \abaf{} 
+\af{\set{\mathit{red},\mathit{pink},\mathit{blue}}}{R},
+where $R$ contains
+$\mathit{red}\attack\mathit{pink}$,
+$\mathit{pink}\attack\mathit{red}$,
+$\mathit{red}\attack\mathit{blue}$,
+$\mathit{blue}\attack\mathit{red}$,
+$\mathit{pink}\attack\mathit{blue} $, and
+$\mathit{blue}\attack\mathit{pink}$,
+represents a discussion about the colour of a certain sweater in the context of a school uniform policy. There are three stable extensions:
+\set{\mathit{red}},
+\set{\mathit{pink}},
+and
+\set{\mathit{blue}}. 
+\end{example}
+All three arguments in Example \ref{exfaf0} are conflicting. However,
+the argument that the sweater is red (e.g.~as raised by a teacher) and
+the argument that the sweater is pink (e.g.~as claimed by the school
+principal) are not conflicting to a very high
+degree, because for a light shade of red one person might call it pink,
+while another might still prefer to call it red.  Suppose that the
+school policy demands for a blue uniform. Both the teacher's and the
+school principal's argument strongly attack the argument that the
+sweater conforms to the school policy (e.g.~as claimed by the
+student). To harvest the best arguments to attack the student's
+argument, it is therefore desirable to be able to include both the
+teacher's and the school principal's argument in the extension to a high degree.
+Indeed the latter two attack each other only to a small
+degree, hence, intuitively, committing to them both to a relatively
+high degree does not significantly violate the conflict-freeness of the extension. 
+
+To allow this kind of expressivity, we extend the classical argumentation model in two ways: (1) by allowing the attack relation to be a fuzzy relation over the set of arguments, we can represent the degree to which arguments attack each other, and (2) by allowing an extension to be a fuzzy set over the set of arguments, we can model that some arguments are accepted to a higher degree than others. 
+%Also, one would expect it to be possible that an agent accepts an argument ``to a
+%certain degree'', or even to weakly accept contradictory arguments,
+%e.g.  to express doubt.  Hence, in the following definition, an
+%\emph{extension} will be a fuzzy set of accepted arguments.
+In the following definition, we formalize these intuitions by
+extending \attack{} to cover fuzzy sets of arguments. A fuzzy argumentation framework consists of a set of arguments, some of which {\em attack each other to a certain degree}.
+
+\begin{definition}\label{def-faf}
+A \emph{fuzzy argumentation framework} (\abfaf{} for short) is a tuple
+$\af{\mc{A}}{\attack}$ where \mc{A} is a set of arguments and \attack{}
+is a fuzzy relation over $\mc{A}$.
+%An \emph{extension} of $F$ is a fuzzy set $A\in\Fuzzy{\mc{A}}$
+%over some truth lattice \Lattice{}.
+For $b$ an argument, and $A$ and $B$ fuzzy sets of arguments, we define the degree to which $A$ attacks $b$ as 
+$A\attack{}b$ $=$ $\suprof{a\in\mc{A}}{A(a) \fand (a\attack{}b)}$,
+and the degree to which $b$ attacks $A$ as
+$b\attack{}A$ $=$ $\suprof{a\in\mc{A}}{A(a) \fand (b\attack{}a)}$.
+%For $A,B\in\Fuzzy{\mc{A}}$ and $B\subseteq\mc{A}$, we define
+Furthermore, the degree to which $A$ attacks $B$ is given by
+$A\attack{}B$ $=$ $\suprof{b\in\mc{A}}{B(b) \fand (A\attack{}b)}$.
+\end{definition}
+According to Definition \ref{def-faf}, the strength of an attack $A\attack{}b$ does not only depend on the strength of an attack $a\attack{}b$, where $a$ is an argument supported by $A$, but also on the degree $A(a)$ to which $A$ supports $a$: the stronger the presence of $a$ in $A$, the stronger the attacks from $A$ through $a$. On the other hand, if an argument $b$ is only present to a marginal degree in $B$, it should be clear that attacking $b$ does not greatly contribute to the ``global'' attack on $B$. 
+
+
+\begin{example}\label{fuzzy-doc}
+Let \af{\mc{A}}{\attack} be a \abfaf{} where \mc{A} contains
+all arguments that appear in two position papers $A$ and $B$.
+Since a position paper does not support each of its arguments in
+equal measure, the papers are best represented by fuzzy sets
+$A,B\in\Fuzzy{\mc{A}}$. Now suppose that there are two arguments
+$a,b\in\mc{A}$ such that $a\attack{}^{0.9} b$, i.e. $a$ strongly
+attacks $b$. On the other hand, $a$ is supported by $A$ but
+not by $B$ while $b$ is not supported by $A$ and only weakly
+by $B$, i.e. $b$ represents only a minor aspect of $B$. 
+E.g. $A(a) = 0.9$, $B(a) = 0$, while $A(b) = 0$ and $B(b) = 0.1$.
+\par
+Then, although in supporting $a$, $A$ attacks $b$ strongly, i.e.~(using the minimum as t-norm in Definition~\ref{def-faf}) $A \attack{}^{0.9} b$, this attack does not noticeably affect $B$'s position as a whole since it contributes only $0.1$ to $A\attack{} B$.
+\end{example}
+
+Intuitively, an extension of a fuzzy argumentation framework is a fuzzy set $A$ such that for each $a$ in $\mc{A}$, $A(a)$ represents the degree to which a rational agent accepts argument $a$. Definition \ref{def-faf-1} provides more flexibility than Definition \ref{def-afb} in three aspects: (1) while in classical argumentation frameworks extensions are required to be entirely conflict-free, in the fuzzy approach they are allowed to contain {\em minor internal attacks}, (2) an admissible extension of a fuzzy argumentation framework only needs to {\em defend itself well enough against all attacks}, and (3), likewise, a stable extension only needs to {\em sufficiently attack all external arguments}, in other words, any argument that is to a high degree outside of the extension should be strongly attacked by it.
+
+\begin{definition}\label{def-faf-1}
+Let \af{\mc{A}}{\attack} be a \abfaf{}.
+A fuzzy set $A$  over $\mc{A}$ is
+\emph{$x$-conflict-free}, $x\in\Lattice{}$, iff $(\fneg (A \attack A)) \geq x$.
+A fuzzy set $A$ is a \emph{$y$-admissible extension}
+if it defends itself well enough against all attacks, i.e. 
+$\infof{b\in\mc{A}}{(b \attack A) \fimp (A \attack b)} \geq y$.
+A \emph{$y$-preferred extension}, $y \in \Lattice{}$, is a maximal (w.r.t. $\subseteq$ 
+over fuzzy sets) $y$-admissible extension.  
+A \emph{$z$-stable extension}, $z\in\Lattice{}$, is a fuzzy set $A$ that sufficiently attacks all external arguments, i.e.
+$\infof{b\in\mc{A}}{\fimplies{\fneg A(b)}{(A \attack b)}} \geq z$.
+\end{definition}
+%
+%Note that $A \attack b = \fullimg{A}{\attack}(b)$
+%and $a \attack B = \fullimg{B}{\attack^{-1}}(a)$.
+%
+%A $z$-stable extension $A$ is such that any element that is to a
+%high degree outside of $A$, is strongly attacked by $A$. 
+%
+
+%The fuzzy version of conflict-free sets allows extensions to
+%contain internal attacks. However, for an $x$-conflict-free set $A$,
+%the strength of such attacks is bounded from above by $\fneg x$. 
+
+\begin{example}\label{ex-sweater}
+%Suppose we are discussing school uniform policy and arguments are
+%exchanged about a certain sweater.  One person claims that the
+%sweater is red (argument $a$), whilst the other claims it
+%is pink (argument $b$).  Obviously, these are conflicting
+%arguments and they attack each other to a certain degree.  But it is
+%also clear that the arguments are not conflicting to a very high
+%degree, because for a light shade of red one person calls it pink,
+%while another still prefers to call it red.  So, we could say that 
+%$a \attack^{0.1} b$ and $b\attack^{0.1} a$, thus expressing
+%doubts about the true colour of the sweater.  Suppose now that the main
+%contested argument is whether the sweater conforms to the school uniform
+%policy and call this $c$. Then, if the school uniform is supposed to
+%be blue, surely we can say that $a \attack^{1} c$ and $b\attack^{1}c$.
+%When we want to harvest the best arguments to attack $c$, we
+%would like both $a$ and $b$ to be included in our extension to a
+%rather high degree, even if they attack each other to a small ($0.1$)
+%degree.  Since whatever our doubts about which one
+%of $a$ and $b$ is more true might be, we can surely conclude that if
+%$a$ and $b$ have a rather high value, the sweater will not be blue.
+%\par
+Assume that we replace the \abaf{} in Example \ref{exfaf0} by a \abfaf{} where the fuzzy attack relation is given by
+$\mathit{red}\attack^{0.1}\mathit{pink}$,
+$\mathit{pink}\attack^{0.1}\mathit{red}$,
+$\mathit{red}\attack^1\mathit{blue}$,
+$\mathit{blue}\attack^1\mathit{red}$,
+$\mathit{pink}\attack^1\mathit{blue} $, and
+$\mathit{blue}\attack^1\mathit{pink}$.
+We consider the fuzzy set $A = \set{\mathit{pink}^{0.8}, \mathit{red}^{0.7}}$, in other words we accept that the sweater has a colour between pink and red. 
+
+To evaluate the conflict-freeness of $A$, we determine the degree to which there are internal attacks in $A$. Using the minimum t-norm we obtain that (cfr.~Definition \ref{def-faf}) $A \attack pink = 0.1$ and $A \attack red = 0.1$, hence $A \attack A = 0.1$, which indicates a minor level of conflict among the accepted arguments. Using the standard negator we obtain $\fneg (A \attack A) = 0.9$, hence $A$ is $0.9$-conflict-free. Note that when using the {\L}ukasiewicz t-norm, which is inherently more tolerant to minor inconsistencies, we would obtain that $A \attack pink = 0$ and $A \attack red = 0$, hence that $A$ is 1-conflict-free. Because of limited space, in the rest of this example we only consider the {\L}ukasiewicz t-norm and its residual implicator.
+
+Next we verify how well $A$ defends itself against all attacks. Since $pink \attack A = 0$ and $red \attack A = 0$, the only real attack on $A$ comes from the argument that the sweater is blue, namely $blue \attack A = 0.8$. However, from $A \attack blue = 0.8$ and the previously mentioned attack values, it is clear that $A$ strikes back with equal force on all attacking arguments. Since for any residual implicator $a \attack A \fimp A \attack a$ equals 1 as soon as $a \attack A \leq A \attack a$, we obtain that $A$ is 1-admissible. 
+% 
+%Furthermore, with the Lukasiewicz t-norm and its residual implicator, we can calculate that $A \attack pink = 0$, $A \attack red = 0$ and $A \attack blue = 1$, as well as $blue \attack a = 1$, due to which $\infof{a \in \mc{A}}{a \attack A \fimp A \attack a} = 1$ and hence $A$ is $1$-admissible.  
+It is however not a $1$-preferred set, since $\set{pink^{0.8},red^{0.8}}$ is a superset of $A$ which is also $1$-admissible.
+
+As for the stability, $\fneg A(pink) \fimp A \attack pink = 0.2 \fimp 0 = 0.8$, $\fneg A(red) \fimp A \attack red = 0.3 \fimp 0 = 0.7$ and $\fneg A(blue) \fimp A \attack blue = 1 \fimp 0.8 = 0.8$.  By which we can conclude that $A$ is a $0.7$-stable extension. Note that $A$ does not have a perfect score for stability because, among other things, $A$ neither fully supports nor opposes the argument that the sweater is red.
+\end{example}
+
+It is straightforward to verify that \abfaf{}s represent a conservative extension
+of the classical notion.
+
+\begin{theorem}\label{faf-extends-af}
+Let $F = \af{\mc{A}}{\attack{}}$ be a \abaf{} and let
+$F_f = \af{\mc{A}}{\attack_f}$ be the fuzzy version over \set{0,1}
+of $F$ with $a \attack_f^1 b$ iff $a\attack b$.
+Then the set of stable extensions of $F$ coincides with the set of
+supports of the $1$-conflict-free $1$-stable extensions of
+$F_f$.
+\end{theorem}
+
+The following theorems describe some
+of the effects of accepting more or less arguments (or accepting them
+to a higher or a lower degree).  
+The extended attack relation is
+monotone w.r.t.~fuzzy set inclusion, i.e.~accepting more arguments
+does not decrease the power to attack.
+
+\begin{theorem}\label{MonotonStable1}
+Let \af{\mc{A}}{\attack} be a \abfaf{} and $B\subseteq A \in \Fuzzy{\mc{A}}$.
+Then $\Forall{a\in\mc{A}}{B \attack a \leq A \attack a}$.
+\end{theorem}
+\begin{proof}
+ Let $A,B \in \mc{F}(\mc{A})$ such that $B \subseteq A$ and let $a \in \mc{A}$, 
+ then if $B \attack a$ this means, by definition, that 
+ $\suprof{b \in \mc{A}}{B(b) \fand (b \attack a)}$.  
+ Now, due to the fact that $\Forall{a \in \mc{A}}{B(a) \leq A(a)}$ 
+ and the monotonicity of $\for$ and $\fand$ it follows that 
+ $\suprof{b \in \mc{A}}{B(b) \fand (b \attack a)} \leq 
+ \suprof{b \in \mc{A}}{A(b) \fand (b \attack a)}$, 
+ thus $B \attack a \leq A \attack a$
+\end{proof}
+
+Furthermore, $z$-stability is
+monotone with respect to fuzzy set inclusion. This might come as a
+surprise since it is not true in the boolean case, but it is due to
+the fact that $z$-stability is independent of the degree of
+conflict-freeness.
+
+
+\begin{theorem}\label{stable-is-monotone}
+Let \af{\mc{A}}{\attack} be a \abfaf{} and $B\subseteq A \in \Fuzzy{\mc{A}}$.
+Then if $B$ is a $z$-stable extension, so is $A$.
+\end{theorem}
+\begin{proof}
+Let $B\in\Fuzzy{\mc{A}}$ be $z$-stable and $B \subseteq
+A\in\Fuzzy{\mc{A}}$. Due to the definition of $z$-stable,
+this means that $\infof{a \in \mc{A}}{\fneg B(a) \fimp B \attack a} \geq z$.
+>From this it follows that $\infof{a \in \mc{A}}{\fneg B(a) \fimp A \attack a} \geq z$
+because of Theorem~\ref{MonotonStable1} and the monotonicity of $\fimp$ in its second argument.
+Due to the fact that $\fneg$ is monotonically decreasing, that 
+$\Forall{a \in \mc{A}}{B(a) \leq A(a)}$ and
+that $\fimp$ is anti-monotone in its first argument, 
+we obtain $\infof{a \in \mc{A}}{\fneg A(a) \fimp A \attack a} \geq z$
+and thus $A$ is also $z$-stable.
+\end{proof}
+
+For $x$-conflict-freeness, we obtain
+anti-monotonicity: adding more arguments, results in more conflicts,
+so conflict-freeness decreases.
+
+\begin{theorem}\label{AntiMonConflictFree}
+Let \af{\mc{A}}{\attack} be a \abfaf{} and let $B\subseteq A \in \Fuzzy{\mc{A}}$.
+Then if $A$ is $x$-conflict-free, so is $B$.
+\end{theorem}
+\begin{proof}
+Let \af{\mc{A}}{\attack} be a \abfaf{} and let $B\subseteq A \in
+\Fuzzy{\mc{A}}$ with $A$ $x$-conflict-free.
+Then, $(B\attack B) \leq (A \attack A)$ follows from $B\subseteq A$,\\
+$B\attack B=\suprof{a\in\mc{A}}{B(a) \fand \suprof{b\in\mc{A}}{B(b) \fand b \attack a}}$,\\
+$A\attack A=\suprof{a\in\mc{A}}{A(a) \fand \suprof{b\in\mc{A}}{A(b) \fand b \attack a}}$,
+and the monotonicity of~$\fand$ and~$\sup$.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      4. Query expansion
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Query Expansion}\label{sec-appl}
+Query expansion is the process of expanding keyword based queries with
+more terms, related to the intended meaning of the query, to refine
+the search results. One option is to use an available thesaurus such
+as WordNet, expanding the query by adding synonyms\cite{voorhees94}.
+Related terms can also be automatically discovered from the searchable documents though, 
+taking into account statistical information such as co-occurrences of words
+in documents: the more frequently two terms co-occur, 
+the more they are assumed to be related\cite{Xu96}.
+
+%Suppose we have a thesaurus of terms, which relates terms that are
+%similar to each other.
+%Then we could just add all terms that are related by the thesaurus to
+%one of the terms in the query.
+%This can however lead to a query that contains too much information, especially
+%when there are ambiguous terms in the query.
+%In the example above, the term ``\emph{apple}'' could be related to
+%both ``\emph{macintosh}'' as well as ``\emph{fruit}'',
+%leading to an expansion with both terms, clearly not a good refinement.
+
+In either case, the thesaurus can be thought of as being a (fuzzy) relation $R$ over the set $X$ of terms. Note that $R$ should be reflexive (i.e.~every term is obviously related to itself) and symmetric (i.e.~if we say that term $a$ is related to term $b$ to a degree of $p$, obviously we want that term $b$ is related to term $a$ in the same degree). Transitivity is not necessarily required, for reasons explained in \cite{FuzzyRoughSets2}.  
+From $X$ and $R$, a \abfaf{} $F$ can be generated such that the conflict-free and stable extensions of $F$ correspond to optimal queries.  
+
+More in particular, we generate the \abfaf{} $F = \af{X}{\attack}$ where $a \attack b = \fneg (a\,R\,b)$. In other words, the arguments of $F$ correspond to terms, and a term $a$ attacks a term $b$ to the extent to which these terms are not related. Note that, due to the symmetry of $R$, every argument in $X$ attacks each one of its attackers to the same degree. 
+
+A set $A \subseteq X$ is then highly conflict-free if every term in $A$ is related to all other terms in $A$ to a high degree, in other words $A$ is a coherent query. Furthermore, $A$ is highly stable if it strongly attacks all external arguments, i.e.~a term can only be left out of the query to the extent that it is not related to at least one of the terms in the query. 
+Together these requirements fit our intuition about what an optimally expanded query should look like, i.e.~a query that has a high stability (refined with as many terms as possible) and is highly conflict-free (without losing the coherence). The following example illustrates the interplay between the conflict-freeness and the stability requirements.
+
+%\par
+%A better approach takes the \emph{context} of the query in consideration
+%and preferably uses a fuzzy thesaurus, so as to be able to correlate
+%terms
+%to a certain degree, i.e. ``\emph{apple}'' is correlated to
+%``\emph{fruit}'' but is not a synonym of ``\emph{fruit}'', so the degree
+%of correlation should not be $1$, but a rather high value.  
+
+
+\begin{example}\label{vbqueryexp1}
+\renewcommand{\tabcolsep}{0.2em}
+\begin{table}[htb]
+\caption{Fuzzy Thesaurus from \cite{FuzzyRoughSets2}\label{thesaurus}}
+\centering
+{\footnotesize
+\begin{tabular}{|l|r|r|r|r|r|r|}
+    \hline
+&mac&recipe&computer&apple&fruit&pie\\
+    \hline
+mac&  $1$  &  $0$ &   $0.89$ & $0.89$ & $0$ & $0.01$\\
+recipe&    &  $1$ &   $0.56$ & $0.83$ & $0.66$ & $1$\\
+computer&  &      &   $1$    & $0.94$  & $0.44$ & $0.44$\\
+apple &     &      &          & $1$     & $0.83$ & $0.99$\\
+fruit &     &      &          &         & $1$ & $0.44$\\
+pie   &     &      &          &         &     & $1$ \\
+    \hline
+\end{tabular}
+}
+\end{table}
+
+
+\begin{table}[htb]
+\caption{Attack Relation}\label{attack-relation}
+\centering
+{\footnotesize
+\begin{tabular}{|l|r|r|r|r|r|r|}
+    \hline
+&mac&recipe&computer&apple&fruit&pie\\
+    \hline
+mac&  $0$  &  $1$ &   $0.11$ & $0.11$ & $1$ & $0.99$\\
+recipe&    &  $0$ &   $0.44$ & $0.17$ & $0.44$ & $0$\\
+computer&  &      &   $0$    & $0.06$  & $0.66$ & $0.66$\\
+apple &     &      &          & $0$     & $0.17$ & $0.01$\\
+fruit &     &      &          &         & $0$ & $0.66$\\
+pie   &     &      &          &         &     & $0$ \\
+    \hline
+\end{tabular}
+}
+\end{table}
+
+Suppose we have a set of terms
+$X = \set{apple, \mathit{fruit}, mac, pie, recipe, computer}$
+and a fuzzy relation $R$ over $X$, defined as in Table~\ref{thesaurus}. The corresponding attack relation, using the standard negator, is depicted in Table \ref{attack-relation}. 
+%\par
+%We can now do two things: regard queries as crisp sets (so a term is either in the query or not) and therefore,
+% use an argumentation framework in which only the attacks will have values that can range %over a lattice,
+%or use queries that are fuzzy sets.  The latter is for example useful in combination with %a suggestion system that suggests
+%one term at a time to expand with.  If the expanded queries
+%``\emph{apple,pie,recipe}'' and ``\emph{apple,pie,fruit}'' would have
+%the same stability and conflict-freeness, we could give the term that
+%has the highest membership in the expanded query preference above the
+%other term.
+%\par
+%In the first case (where a query is a crisp set), suppose we are
+%looking for a $0.6$-stable extension of the query 
+The user query that we aim to expand is $Q_1=\{apple, pie\}$. Independently of the choice of t-norm in Definition \ref{def-faf}, it holds that $Q_1 \attack mac = 0.99$, $Q_1 \attack recipe = 0.17$, $Q_1 \attack computer = 0.66$, $Q_1 \attack apple = 0.01$, $Q_1 \attack fruit = 0.66$ and $Q_1 \attack pie = 0.01$. 
+
+The query $Q_1$ is highly conflict-free, namely to degree 0.99 when using the standard negator, since the strength of the attack $apple \attack pie$ is almost neglectable. On the other hand, $Q_1$ is only a $0.17$-stable extension (independently of the choice of negator and of the choice of implicator in Definition \ref{def-faf-1}). This unstability is due to the term recipe being excluded from the query without there being a good reason to. Indeed, recipe is not strongly attacked by any of the keywords from the query so, in terms of stability, there is no reason not to include it. 
+ 
+However, it is not possible to add more terms to the query while keeping the original high level of conflict-freeness. We therefore lower our standards and look for expanded queries that are $0.8$-conflict-free. The only expanded query that satisfies this condition is $Q_2 = \{apple, pie, recipe\}$, which is a $0.66$-stable extension.
+\end{example}
+
+\begin{example}\label{vbqueryexp2}
+Adding more terms to query $Q_2$ in Example \ref{vbqueryexp1} results in a significant drop in conflict-freeness. Indeed, the remaining terms mac, computer, and fruit are under an attack with a strength of at least 0.66 by at least one of the terms already in $Q_2$, so including yet another term in $Q_2$ would leave the conflict-freeness at most at 0.44. However, in the setting described in this section, it is also possible to consider weighted queries. For instance, one can verify that, using the minimum t-norm, for $Q_3 = \{apple^1, pie^1, recipe^1, fruit^{0.3}\}$ we obtain that
+$Q_3 \attack mac = 1$, $Q_3 \attack recipe = 0.3$, $Q_3 \attack computer = 0.66$, $Q_3 \attack apple = 0.17$, $Q_3 \attack fruit = 0.66$ and $Q_3 \attack pie = 0.3$. Hence, $Q_3$ is $0.7$-conflict-free, and, using the residual or the S-implicator associated with the minimum t-norm, $Q_3$ is still a $0.66$-stable extension.
+\end{example}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      5. Link with FASP
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{FAF and Fuzzy Answer Set Programming}\label{sec-fasp}
+
+The answer set programming (ASP) paradigm\cite{BaralBook} has gained a lot of popularity in the last years, due to its truly declarative non-monotonic semantics. ASP and fuzzy logic can be be combined into the single framework of fuzzy answer set programming to increase the flexibility and hence the application potential of ASP.
+A \emph{fuzzy answer set program}\cite{fasp0}, \abfasp{} for short, is
+a finite set of rules\footnote{
+  In the present paper we do not consider negative
+  literals of the form $\neg a$, $a$ an atom. In terms
+  of \cite{fasp0}, this makes every interpretation $1$-consistent.
+  Also, we do not consider constraints (rules with empty head).}
+of the form \prule{a}{\alpha} with $a$ an \emph{atom}
+and $\alpha$ a set of \emph{literals}, %$\alpha_i$
+each of which
+is either an atom or of the form \naf{a}, $a$ an atom,
+representing the ``negation as failure'' of $a$.
+
+A \emph{fuzzy interpretation} of a \abfasp{} $P$ is a mapping 
+$I: \hbase{P} \rightarrow \Lattice{}$ assigning a truth value
+from the lattice \Lattice{} to each of the atoms appearing in $P$.
+$I$ is extended to literals by defining $I(\naf{a}) = \fneg I(a)$
+and to rules \lprule{r}{a}{\alpha} using 
+$I(\alpha) = \fand_{l\in\alpha} I(l)$ and 
+$I(r) = \fimplies{I(\alpha)}{I(a)}$. 
+
+A fuzzy $y$-\emph{model}, $y\in\Lattice$, of $P$ is a fuzzy
+interpretation $I$ that satisfies $\mc{A}_p (P,I) \geq y$
+where $\mc{A}_p$ is a function that takes as input a program and an
+interpretation, yielding a value denoting the degree in which
+$I$ is a model of $P$. Naturally, $\mc{A}_p$ should be increasing
+whenever the degrees of satisfaction $I(r)$ of the rules in $P$ are
+increasing.
+
+We show that, under certain conditions, the $y$-stable extensions
+of a \abfaf{} $F=\af{\mc{A}}{\attack}$ correspond to the fuzzy $y$-models %\cite{fasp0}
+of a \abfasp{} $\Pi_F$ that can be constructed from $F$ as follows: 
+intuitively, 
+for each argument $a\in\mc{A}$, $\Pi_F$ will contain
+exactly one rule $r_a$ introducing $a$. The body of $r_a$ contains
+one literal $\naf{b_a}$ for each $b\in\mc{A}$ such that $(b\attack
+a)>0_\Lattice{}$. Each literal $b_a$ is itself defined through a
+single rule\footnote{
+  Although program rules in~\cite{fasp0} syntactically may not contain
+  constants from \Lattice{}, the semantics in \cite{fasp0} easily supports
+  such an extension using the ``fuzzy input literals'' mechanism
+  (Section~4 in~\cite{fasp0}).
+} \prule{b_a}{b, (b\attack a)}.
+
+\begin{definition}
+For a \abfaf{} $F=\af{\mc{A}}{\attack}$, the associated \abfasp{} $\Pi_F$
+is defined by $\Pi_F = R_a \cup R_b$
+where
+\begin{eqnarray*}
+R_a & = & \set{ \prule{a}{
+                     \set{\naf{b_a} \mid (b \attack a > 0_\Lattice{})}
+                    } \mid a\in\mc{A}} \\
+R_b & = & \set{ \prule{b_a}{b, (b\attack a)} \mid (b\attack{}a)>0_\Lattice{} }
+\end{eqnarray*}
+Where we take $min$ as the t-norm for aggregating the body in $R_a$-rules and the t-norm
+of the argumentation framework for the $R_b$-rules.\\
+The aggregator $\mc{A}_{\Pi_F}$ is such that all rules from $R_b$ must
+evaluate to $1_\Lattice{}$, while for other rules, the minimal
+degree of satisfaction is taken, i.e.
+\[
+\mc{A}_{\Pi_F}(\Pi_F, I) = \left\{
+  \begin{array}{l@{\quad\quad}l}
+  \infof{r_a \in R_a}{I(r_a)} & \mbox{\small iff ($\alpha$)}\\
+  0_\Lattice{} & \mbox{\small otherwise}
+  \end{array}
+  \right.
+\]
+where $(\alpha) \equiv \Forall{r\in R_b}{I(r) = 1_\Lattice{}}$.
+\end{definition}
+Note that any argument $a$ that is not attacked will have a corresponding fact 
+rule \prule{a}{} in $R_a$.
+
+We show that
+$y$-stable extensions of $F$ correspond to certain fuzzy $y$-models of $\Pi_F$.
+
+\begin{theorem}\label{ThmFafFasp}
+ Let $F=\af{\mc{A}}{\attack}$ be a \abfaf{}.
+If $\fimp$ is a contrapositive implicator,
+ $x = y \imp x \fimp y = 1$,
+ $\fneg$ is an involutive negator and
+ $\fneg \suprof{x \in X}{F(x)} = \infof{x \in X}{\fneg F(x)}$,
+then for any $y \in \mc{L}$,
+$X$ is a $y$-stable extension of $F$
+iff $X' = X \cup \set{ b_a^q \mid q = (X(b) \fand (b \attack a))}$
+is a $y$-model of $\Pi_F$.
+\end{theorem}
+\begin{proof}
+Suppose $X$ is a $y$-stable extension of $F$.  By the definition of $y$-stable extensions, this is equivalent to
+ $$\infof{a\in\mc{A}}{\fneg X(a) \fimp (X \attack a)} \geq y$$
+Using contraposition this is equivalent to
+ $$\infof{a\in\mc{A}}{\fneg(X \attack a) \fimp X(a)} \geq y$$
+Then, by the definition of $X \attack a$
+ $$\infof{a\in\mc{A}}{\fneg\suprof{b\in\mc{A}}{X(b) \fand (b \attack a)} \fimp X(a)} \geq y$$
+Which is equivalent to
+ $$\infof{a\in\mc{A}}{\fneg\suprof{b\in\mc{A} \wedge (b \attack a) > 0_\mc{L}}{X(b) \fand (b \attack a)} \fimp X(a)} \geq y$$
+Due to the generalised De Morgan properties we get
+ $$\infof{a\in\mc{A}}{\infof{b\in\mc{A} \wedge (b \attack a) > 0_\mc{L}}{\fneg(X(b) \fand (b \attack a))} \fimp X(a)} \geq y$$
+By definition of $X'$ this is equivalent to
+ $$\infof{a\in\mc{A}}{\infof{b\in\mc{A} \wedge (b \attack a) > 0_\mc{L}}{\fneg X'(b_a)} \fimp X'(a)} \geq y$$
+Which, due to the construction of $\Pi_F$ and the interpretation of rules is equivalent to
+ $$\infof{r \in R_a}{X'(r)} \geq y$$
+Which is equivalent to the definition of a $y$-model of $\Pi_F$ due to the fact that $\inf$ is the aggregator for rules in $R_a$ if all rules in $R_b$ are $1$.  The latter is established by the fact that $X'(b_a) = X'(b) \fand (b \attack a)$ and by the restriction on the chosen implicator.
+\end{proof}
+
+Note that the above equivalence concerns \abfasp{} \emph{models}, not
+answer sets where answer sets are models that are free from
+``assumptions''\cite{fasp0} and, in a sense, minimal models. 
+However, unlike with answer set programming,
+minimality is not a desirable criterion for argumentation frameworks
+as, intuitively, one attempts to maximize the set of arguments that can be defended
+against attacks. The only limit on the size of an extension is the
+desire for conflict-freeness (see also
+Theorems~\ref{stable-is-monotone} and~\ref{AntiMonConflictFree})
+which can be imposed separately.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%      6. Conclusion
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Concluding Remarks}\label{sec-conclusions}
+%and Directions for Further Research}
+We've motivated and introduced fuzzy argumentation frameworks as a conservative
+extension of the classical notion from~\cite{dung95} which allows for
+more fine-grained knowledge representation in terms of doubts (some
+degree of conflict may be tolerated) and strength of attacks, both absolute and
+with respect to the degree of acceptance of the attacker and the
+attacked. The strong connection with Fuzzy Answer Set
+Programming\cite{fasp0} also provides a practical implementation
+using \textsc{dlvhex}\cite{fasp1}. In future work, we intend to extend
+our approach to (applications of) bipolar argumentation 
+frameworks\cite{cayrol2005,karacapilidis2001,verheij2002,amgoud2004}.
+We will also investigate dialogical semantics, see e.g. \cite{jv99.1}, 
+for fuzzy argumentation frameworks.
+\bibliography{bib}
+\end{document}
