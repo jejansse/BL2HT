@@ -1,0 +1,55 @@
+h1,h2,h3,h4,h5 {
+	font-family: Trebuchet MS, Tahoma, Verdana;
+}
+
+body {
+	font-family: Trebuchet MS, Tahoma, Verdana;
+	font-size: 14px;
+	background-color: #BFBFBF;
+}
+
+#menu {
+	position: fixed;
+	left: 10px;
+	top: 10px;
+}
+
+#title {
+	font-size: 300%;
+}
+
+.theorem {
+	padding: 0.5em;
+	border: 1px solid #dddddd;
+	border-radius: 4px;
+	border-color: #dddddd;
+	color: #333333;
+	background: #eeeeee url(content-bg.png) 50% top repeat-x;
+	z-index: -1;
+	margin: 0.5em;
+}
+
+.theoremtitle {
+	background: #f6a828 url(title-bg.png) 50%;
+	border: 1px solid #E78F08;
+	color: #FFFFFF;
+	font-weight: bold;
+	padding: 0.5em;
+	border-radius: 4px;
+	z-index: 1;
+}
+
+.theorempopup {
+	visible: false;	
+}
+
+#content {
+	position: absolute;
+	left: 15%;
+	right: 15%;
+	background-color: #FFFFFF;
+	border: 1px solid #eeeeee;
+	border-color: #dddddd;
+	border-radius: 4px;
+	padding: 10px;
+}

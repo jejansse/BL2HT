@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>LaTeX > HTML Test</title>
+	<link rel="stylesheet" href="latex2html.css">
+	<link rel="stylesheet" href="jquery/ui/css/ui-lightness/jquery-ui-1.8.10.custom.css">
+	<script src="jquery/jquery.js"></script>
+	<script src="jquery/ui/jquery.ui.core.js"></script>
+	<script src="jquery/ui/jquery.ui.widget.js"></script>
+	<script src="jquery/ui/jquery.ui.mouse.js"></script>
+	<script src="jquery/ui/jquery.ui.draggable.js"></script>
+	<script src="jquery/ui/jquery.ui.position.js"></script>
+	<script src="jquery/ui/jquery.ui.resizable.js"></script>
+	<script src="jquery/ui/jquery.ui.dialog.js"></script>
+	<script src="MathJax/MathJax.js"></script>
+	<script>
+		$(function() {
+			$('#ref-def-imcons').hover(function () {
+				$('#def-imcons-popup').dialog({
+					position: {
+						my: 'top',
+						at: 'bottom',
+						of: '#ref-def-imcons'
+					}
+				});
+			},
+			function () {});
+			$('#def-imcons-popup').hide();
+			$('#def-imcons-counter').html('2.3');
+			// In principe kunnen we door door de counter classes te gaan of de thm counters te gaan
+			// de counters aanpassen (evt. per sectie, maar dat moet dan eens uitgezocht worden hoe
+			// we kunnen checken in welke sectie we zitten?)
+		});
+	</script>
+</head>
+<body>
+
+	<div id="menu">
+		<div class="menusectionentry">1. Introduction</div>
+		<div class="menusectionentry">2. Preliminaries</div>
+		<div class="menusubsectionentry">2.1 Answer Set Programming</div>
+	</div>
+
+	<div id="content">
+	<div class="title">Fuzzy Answer Set Programming</div>
+	<div class="authordetails">
+		<div class="authorname">Jeroen Janssen</div>
+		<div class="authoraffiliation">Vrije Universiteit Brussel</div>
+		<div class="authoremail">Jeroen.Janssen@vub.ac.be</div>
+		<div class="sectiontitle">1. Introduction</div>
+		<div class="sectiontitle">2. Preliminaries</div>
+		<div class="sectiontitle">2.1 Answer Set Programming</div>
+	</div>
+	<div id="def-imcons" class="theorem">
+		<div class="theoremtitle">Theorem <span id="def-imcons-counter" class="thmcounter counter"></span></div>
+		<p>The <em>immediate consequence operator</em> of a program \(P\,\) is a \(\mathbb{B}_P \to [0,1]\) operator
+		defined for an interpretation \(I\) of \(P\,\) and element \(a \in \mathbb{B}_P\) as:
+		 $$\Pi_{P}(I)(a) = \max \{ I(B(r)) \mid r \in P_a \}$$
+		 </p>
+	</div>
+	<div id="def-imcons-popup" title="Theorem 3.2">
+		The <em>immediate consequence operator</em> of a program \(P\) is a \(\mathbb{B}_P \to [0,1]\) operator
+		defined for an interpretation \(I\) of \(P\) and element \(a \in \mathbb{B}_P\) as:
+		 $$\Pi_{P}(I)(a) = \max \{ I(B(r)) \mid r \in P_a \}$$
+	</div>
+	<p>See <span id="ref-def-imcons" class="popuplink"> Definition 2.3</span></p>
+	</div>
+</body>
+</html>
