@@ -18,20 +18,17 @@ Parsing (some) LaTeX source code
 module Text.BL2HT.LaTeX.Parse (
 ) where
 
-import Text.ParserCombinators.Parsec
-
-import qualified Data.ByteString as B
-import Data.ByteString.Char8 () -- IsString instance
+import Text.ParserCombinators.Parsec hiding (many, (<|>))
+import Control.Applicative
 
 
 -- | Parses LaTeX command, returns (name, star, list of options or arguments).
-command :: GenParser Char st ([Char], [Char], [[Char]])
+command :: GenParser Char st ([Char], [[Char]])
 command = do
   char '\\'
   name <- many1 letter
-  star <- option "" (string "*")  -- some commands have starred versions
   args <- commandArgs
-  return (name, star, args)
+  return (name, args)
 
 -- | Returns text between brackets and its matching pair.
 bracketedText :: Char -> Char -> GenParser Char st [Char]
@@ -61,4 +58,16 @@ charsInBalanced' open close = try $ do
                           return $ [open] ++ res ++ [close])
   char close
   return $ concat raw
+
+data BasicTex =
+      Command   { texCommand :: (String, [String]) }
+    | OtherText { texText :: String }
+    deriving Show
+
+-- | Parse a TeX document
+latexDocument = many token
+    where
+        token = Command   <$> command
+            <|> OtherText <$> nocommand
+        nocommand = many1 $ noneOf "\\"
 
