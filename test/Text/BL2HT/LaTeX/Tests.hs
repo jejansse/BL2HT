@@ -19,24 +19,31 @@ testParse string expected = case parse parseDoc  "" string of
     otherwise -> False
 
 testSingleOptArgument = testProperty "Single argument" $ testParse  "\\documentclass[12pt]{sth} a paper" $
-    [ Command { texCommand = ( "documentclass", [ OtherText { texText = "[12pt]" },
-                                                  OtherText { texText = "{sth}" }  ]) },
-      OtherText { texText = " a paper" } ]
+    [ Command { cmdName = "documentclass",
+                optArgs = [ OtherText "12pt" ],
+                reqArgs = [ OtherText "sth" ] },
+      OtherText " a paper" ]
 
 testSingleArgument = testProperty "Single argument" $ testParse "\\section{A Section name} a section text" $
-    [ Command { texCommand = ( "section", [ OtherText { texText = "{A Section name}" } ] ) },
-      OtherText { texText = " a section text" } ]
+    [ Command { cmdName = "section",
+                optArgs = [],
+                reqArgs = [ OtherText "A Section name" ] },
+      OtherText " a section text" ]
 
 testSingleCommand = testProperty "Single command" $ testParse  "\\item this is an item" $
-    [ Command { texCommand = ( "item", [] ) },
-      OtherText { texText = " this is an item" } ]
+    [ Command { cmdName = "item",
+                optArgs = [],
+                reqArgs = [] },
+      OtherText " this is an item" ]
 
 testSinglyNestedCommand = testProperty "Singly nested command" $ testParse "\\author{A \\and B}" $
-    [ Command { texCommand = ( "author", [
-            OtherText { texText = "A " },
-            Command   { texCommand = ( "and", [] ) },
-            OtherText { texText = " B" }
-        ] ) } ]
+    [ Command { cmdName = "author",
+                optArgs = [],
+                reqArgs = [
+                    OtherText "A ",
+                    Command "and" [] [],
+                    OtherText " B"
+                ] } ]
 
 tests :: [Test]
 tests = [
