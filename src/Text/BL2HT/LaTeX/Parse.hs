@@ -60,7 +60,7 @@ charsInBalanced' open close = try $ do
   return $ concat raw
 
 data BasicTex =
-      Command   { texCommand :: (String, [String]) }
+      Command   { texCommand :: (String, [BasicTex]) }
     | OtherText { texText :: String }
     deriving Show
 
