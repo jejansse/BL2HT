@@ -37,23 +37,15 @@ parseText = OtherText <$> noCommand
   where noCommand = many1 $ noneOf "\\{}[]"
 
 -- | Parses optional commands argument
-parseOptArgs :: GenParser Char st [BasicTex]
-parseOptArgs = try parseOptArg <|> return []
-  where 
-    parseOptArg = do
-      char '['
-      arguments <- parseDoc
-      char ']'
-      return arguments
-
-parseReqArgs :: GenParser Char st [BasicTex]
-parseReqArgs = try parseReqArg <|> return []
+parseOptArgs :: GenParser Char st [LatexDoc]
+parseOptArgs = option [] parseOptArgs1
   where
-    parseReqArg = do
-      char '{'
-      arguments <- parseDoc
-      char '}'
-      return arguments
+    parseOptArgs1 = between (char '[') (char ']') (parseDoc `sepBy` char ',')
+
+parseReqArgs :: GenParser Char st [LatexDoc]
+parseReqArgs = option [] parseOptArgs1
+  where
+    parseOptArgs1 = between (char '{') (char '}') (parseDoc `sepBy` char ',')
 
 parseDoc :: GenParser Char st [BasicTex]
 parseDoc = many $ parseCommand <|> parseText
@@ -89,11 +81,13 @@ parseDoc = many $ parseCommand <|> parseText
 --
 data BasicTex =
       Command   { cmdName :: String
-                , optArgs :: [BasicTex]
-                , reqArgs :: [BasicTex]
+                , optArgs :: [LatexDoc]
+                , reqArgs :: [LatexDoc]
                 }
     | OtherText { texText :: String }
     deriving (Show, Eq)
+
+type LatexDoc = [BasicTex]
 
 -- | Parse a TeX document
 --latexDocument = many token

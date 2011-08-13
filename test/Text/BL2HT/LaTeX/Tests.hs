@@ -20,14 +20,14 @@ testParse string expected = case parse parseDoc  "" string of
 
 testSingleOptArgument = testProperty "Single argument" $ testParse  "\\documentclass[12pt]{sth} a paper" $
     [ Command { cmdName = "documentclass",
-                optArgs = [ OtherText "12pt" ],
-                reqArgs = [ OtherText "sth" ] },
+                optArgs = [[ OtherText "12pt" ]],
+                reqArgs = [[ OtherText "sth" ]] },
       OtherText " a paper" ]
 
 testSingleArgument = testProperty "Single argument" $ testParse "\\section{A Section name} a section text" $
     [ Command { cmdName = "section",
                 optArgs = [],
-                reqArgs = [ OtherText "A Section name" ] },
+                reqArgs = [[ OtherText "A Section name" ]] },
       OtherText " a section text" ]
 
 testSingleCommand = testProperty "Single command" $ testParse  "\\item this is an item" $
@@ -39,11 +39,11 @@ testSingleCommand = testProperty "Single command" $ testParse  "\\item this is a
 testSinglyNestedCommand = testProperty "Singly nested command" $ testParse "\\author{A \\and B}" $
     [ Command { cmdName = "author",
                 optArgs = [],
-                reqArgs = [
+                reqArgs = [[
                     OtherText "A ",
                     Command "and" [] [],
                     OtherText " B"
-                ] } ]
+                ]] } ]
 
 testMoreArguments = testProperty "More than one argument" $ testParse "\\newtheorem{definition}{Definition}\\section{Intro}" $
     [ Command { cmdName = "newtheorem",
