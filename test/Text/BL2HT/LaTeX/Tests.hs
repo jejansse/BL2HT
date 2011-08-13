@@ -14,7 +14,7 @@ import Text.ParserCombinators.Parsec hiding (many, (<|>))
 
 import Text.BL2HT.LaTeX.Parse
 
-testParse string expected = case parse latexDocument  "" string of
+testParse string expected = case parse parseDoc  "" string of
     Right r   -> expected == r
     otherwise -> False
 
