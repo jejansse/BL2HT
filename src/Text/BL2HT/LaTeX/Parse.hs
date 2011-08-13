@@ -25,7 +25,7 @@ import Control.Applicative
 
 
 -- | Parses LaTeX command, returns (name, star, list of options or arguments).
-command :: GenParser Char st ([Char], [[Char]])
+command :: GenParser Char st (String, [BasicTex])
 command = do
   char '\\'
   name <- many1 letter
@@ -33,22 +33,22 @@ command = do
   return (name, args)
 
 -- | Returns text between brackets and its matching pair.
-bracketedText :: Char -> Char -> GenParser Char st [Char]
+bracketedText :: Char -> Char -> GenParser Char st String
 bracketedText openB closeB = do
   result <- charsInBalanced' openB closeB
   return $ [openB] ++ result ++ [closeB]
 
 -- | Returns an option or argument of a LaTeX command.
-optOrArg :: GenParser Char st [Char]
-optOrArg = try $ spaces >> (bracketedText '{' '}' <|> bracketedText '[' ']')
+optOrArg :: GenParser Char st BasicTex
+optOrArg = try $ spaces >> (OtherText <$> bracketedText '{' '}' <|> OtherText <$> bracketedText '[' ']')
 
 -- | True if the string begins with '{'.
-isArg :: [Char] -> Bool
+isArg :: String -> Bool
 isArg ('{':_) = True
 isArg _       = False
 
 -- | Returns list of options and arguments of a LaTeX command.
-commandArgs :: GenParser Char st [[Char]]
+commandArgs :: GenParser Char st [BasicTex]
 commandArgs = many optOrArg
 
 -- | Like @charsInBalanced@, but allow blank lines in the content.
@@ -62,7 +62,7 @@ charsInBalanced' open close = try $ do
   return $ concat raw
 
 data BasicTex =
-      Command   { texCommand :: (String, [String]) }
+      Command   { texCommand :: (String, [BasicTex]) }
     | OtherText { texText :: String }
     deriving Show
 
