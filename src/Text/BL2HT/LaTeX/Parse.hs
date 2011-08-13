@@ -17,7 +17,7 @@ Parsing (some) LaTeX source code
 
 module Text.BL2HT.LaTeX.Parse (
       BasicTex(..)
-    , latexCommand
+    , latexDocument
 ) where
 
 import Text.ParserCombinators.Parsec hiding (many, (<|>))
