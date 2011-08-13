@@ -41,18 +41,18 @@ parseOptArgs :: GenParser Char st [BasicTex]
 parseOptArgs = try parseOptArg <|> return []
   where 
     parseOptArg = do
-      char '{'
+      char '['
       arguments <- parseDoc
-      char '}'
+      char ']'
       return arguments
 
 parseReqArgs :: GenParser Char st [BasicTex]
 parseReqArgs = try parseReqArg <|> return []
   where
     parseReqArg = do
-      char '['
+      char '{'
       arguments <- parseDoc
-      char ']'
+      char '}'
       return arguments
 
 parseDoc :: GenParser Char st [BasicTex]
