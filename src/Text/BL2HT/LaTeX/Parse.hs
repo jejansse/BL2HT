@@ -23,7 +23,7 @@ import Control.Applicative
 
 
 -- | Parses LaTeX command, returns (name, star, list of options or arguments).
-command :: GenParser Char st ([Char], [[Char]])
+command :: GenParser Char st (String, [String])
 command = do
   char '\\'
   name <- many1 letter
@@ -31,22 +31,22 @@ command = do
   return (name, args)
 
 -- | Returns text between brackets and its matching pair.
-bracketedText :: Char -> Char -> GenParser Char st [Char]
+bracketedText :: Char -> Char -> GenParser Char st String
 bracketedText openB closeB = do
   result <- charsInBalanced' openB closeB
   return $ [openB] ++ result ++ [closeB]
 
 -- | Returns an option or argument of a LaTeX command.
-optOrArg :: GenParser Char st [Char]
+optOrArg :: GenParser Char st String
 optOrArg = try $ spaces >> (bracketedText '{' '}' <|> bracketedText '[' ']')
 
 -- | True if the string begins with '{'.
-isArg :: [Char] -> Bool
+isArg :: String -> Bool
 isArg ('{':_) = True
 isArg _       = False
 
 -- | Returns list of options and arguments of a LaTeX command.
-commandArgs :: GenParser Char st [[Char]]
+commandArgs :: GenParser Char st [String]
 commandArgs = many optOrArg
 
 -- | Like @charsInBalanced@, but allow blank lines in the content.
