@@ -93,7 +93,7 @@ data BasicTex =
                 , reqArgs :: [BasicTex]
                 }
     | OtherText { texText :: String }
-    deriving Show
+    deriving (Show, Eq)
 
 -- | Parse a TeX document
 --latexDocument = many token
