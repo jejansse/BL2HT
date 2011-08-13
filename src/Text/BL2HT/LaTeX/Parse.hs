@@ -34,7 +34,7 @@ parseCommand = do
 
 parseText :: GenParser Char st BasicTex
 parseText = OtherText <$> noCommand
-  where noCommand = many1 $ noneOf "\\"
+  where noCommand = many1 $ noneOf "\\{}[]"
 
 -- | Parses optional commands argument
 parseOptArgs :: GenParser Char st [BasicTex]
