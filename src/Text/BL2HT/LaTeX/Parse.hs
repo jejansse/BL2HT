@@ -37,19 +37,22 @@ parseText :: GenParser Char st BasicTex
 parseText = OtherText <$> noCommand
   where noCommand = many1 $ noneOf "\\{}[]$"
 
-getTextMathMode =
-        string "$"  <* noneOf "$"
-    <|> string "$$" <* noneOf "$"
+getTextMathMode = do
+    dollars <- many $ char '$'
+    return $ case dollars of
+        ['$'] -> "$"
+        ['$', '$'] -> "$$"
+        _ -> fail "Unknown amount of dollars"
 
 mathModeFromText "$"  = MathInline
 mathModeFromText "$$" = MathBig
 mathModeFromText _    = error "No such math mode"
 
 parseMath :: GenParser Char st BasicTex
-parseMath = do
+parseMath = try $ do
     mm <- getTextMathMode
     math <- many1 $ noneOf "$"
-    string mm >> noneOf "$"
+    string mm >> (lookAhead $ noneOf "$")
     return $ Maths (mathModeFromText mm) math
 
 -- | Parses optional commands argument
