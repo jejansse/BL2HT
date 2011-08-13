@@ -17,6 +17,7 @@ Parsing (some) LaTeX source code
 
 module Text.BL2HT.LaTeX.Parse (
       BasicTex(..)
+    , MathMode(..)
     , parseDoc
 ) where
 
@@ -34,7 +35,22 @@ parseCommand = do
 
 parseText :: GenParser Char st BasicTex
 parseText = OtherText <$> noCommand
-  where noCommand = many1 $ noneOf "\\{}[]"
+  where noCommand = many1 $ noneOf "\\{}[]$"
+
+getTextMathMode =
+        string "$"  <* noneOf "$"
+    <|> string "$$" <* noneOf "$"
+
+mathModeFromText "$"  = MathInline
+mathModeFromText "$$" = MathBig
+mathModeFromText _    = error "No such math mode"
+
+parseMath :: GenParser Char st BasicTex
+parseMath = do
+    mm <- getTextMathMode
+    math <- many1 $ noneOf "$"
+    string mm >> noneOf "$"
+    return $ Maths (mathModeFromText mm) math
 
 -- | Parses optional commands argument
 parseOptArgs :: GenParser Char st [LatexDoc]
@@ -48,7 +64,7 @@ parseReqArgs = option [] parseOptArgs1
     parseOptArgs1 = between (char '{') (char '}') (parseDoc `sepBy` char ',')
 
 parseDoc :: GenParser Char st [BasicTex]
-parseDoc = many $ parseCommand <|> parseText
+parseDoc = many $ parseCommand <|> parseText <|> parseMath
 
 ---- | Returns text between brackets and its matching pair.
 --bracketedText :: Char -> Char -> GenParser Char st String
@@ -79,10 +95,17 @@ parseDoc = many $ parseCommand <|> parseText
 --  char close
 --  return $ concat raw
 --
+
+data MathMode = MathInline | MathBig
+    deriving (Show, Eq)
+
 data BasicTex =
       Command   { cmdName :: String
                 , optArgs :: [LatexDoc]
                 , reqArgs :: [LatexDoc]
+                }
+    | Maths     { mathMode :: MathMode
+                , mathText :: String
                 }
     | OtherText { texText :: String }
     deriving (Show, Eq)
