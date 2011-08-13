@@ -48,10 +48,10 @@ testSinglyNestedCommand = testProperty "Singly nested command" $ testParse "\\au
 testMoreArguments = testProperty "More than one argument" $ testParse "\\newtheorem{definition}{Definition}\\section{Intro}" $
     [ Command { cmdName = "newtheorem",
                 optArgs = [],
-                reqArgs = [ OtherText "definition", OtherText "Definition" ] },
+                reqArgs = [[ OtherText "definition", OtherText "Definition" ]] },
       Command { cmdName = "section",
                 optArgs = [],
-                reqArgs = [ OtherText "Intro" ] } ]
+                reqArgs = [[ OtherText "Intro" ]] } ]
 
 tests :: [Test]
 tests = [
