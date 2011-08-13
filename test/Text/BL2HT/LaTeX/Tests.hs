@@ -53,6 +53,21 @@ testMoreArguments = testProperty "More than one argument" $ testParse "\\newtheo
                 optArgs = [],
                 reqArgs = [[ OtherText "Intro" ]] } ]
 
+testSimpleMathInline = testProperty "Simple math inline" $ testParse "$a^b$" $
+    [ Maths MathInline "a^b" ]
+
+testSimpleMathBig = testProperty "Simple math big" $ testParse "$$a^b$$" $
+    [ Maths MathBig "a^b" ]
+
+testSimpleMathInlineText = testProperty "Simple math inline with text around" $ testParse "A $a^b$ B" $
+    [ OtherText "A ", Maths MathInline "a^b", OtherText " B" ]
+
+testSimpleMathBigText = testProperty "Simple math big with text around" $ testParse "A $$a^b$$ B" $
+    [ OtherText "A ", Maths MathBig "a^b", OtherText " B" ]
+
+testSimpleMathInlineCommands = testProperty "Simple math inline with commands around" $ testParse "\\date $a^b$\\date" $
+    [ Command "date" [] [], OtherText " ", Maths MathInline "a^b", Command "date" [] [] ]
+
 tests :: [Test]
 tests = [
       testSingleOptArgument
@@ -60,5 +75,10 @@ tests = [
     , testSingleCommand
     , testSinglyNestedCommand
     , testMoreArguments
+    , testSimpleMathInline
+    , testSimpleMathBig
+    , testSimpleMathInlineText
+    , testSimpleMathBigText
+    , testSimpleMathInlineCommands
     ]
 
